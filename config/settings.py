@@ -32,6 +32,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -45,6 +47,8 @@ INSTALLED_APPS = [
     'profiles',
     'notes',
 ]
+
+ASGI_APPLICATION = "config.asgi.application"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -93,10 +97,16 @@ if 'POSTGRES_PASSWORD_FILE' in os.environ:
         POSTGRES_PASSWORD = f.read().strip()
         DATABASE_HOST = 'db'
         REDIS_HOST = 'redis://redis:6379'
+        REDIS_PORT = 6379
+        REDIS_DB = 0
 else:
     POSTGRES_PASSWORD = 'mysecretpassword'
     DATABASE_HOST = 'localhost'
-    REDIS_HOST = 'redis://127.0.0.1:6379'
+    REDIS_HOST = '127.0.0.1'
+    REDIS_PORT = 6379
+    REDIS_DB = 0
+
+
 
 DATABASES = {
     'default': {
@@ -107,6 +117,16 @@ DATABASES = {
         'HOST': DATABASE_HOST,
         'PORT': '5432',
     }
+}
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", REDIS_PORT)],
+        },
+    },
 }
 
 

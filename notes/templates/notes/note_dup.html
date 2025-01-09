@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Collaborative Note</title>
+    <script>
+        let noteId = "{{ note.id }}";
+        let socket = new WebSocket(`ws://localhost:8000/ws/note/1/?token=0dbce50d91f59bd530135bc3bbcd9999d6cfd1e8`);
+
+        socket.onmessage = function(event) {
+            let data = JSON.parse(event.data);
+
+            if (data.type === "user_list") {
+                let userList = document.getElementById("online-users");
+                userList.innerHTML = "";
+                data.users.forEach(user => {
+                    let li = document.createElement("li");
+                    li.textContent = user;
+                    userList.appendChild(li);
+                });
+            } else {
+                let textarea = document.getElementById("content");
+                textarea.value = data.content;
+            }
+        };
+        function sendUpdate() {
+            let content = document.getElementById("content").value;
+            socket.send(JSON.stringify({"content": content}));
+        }
+    </script>
+</head>
+<body>
+    <h1>{{ note.title }}</h1>
+    
+    <h3>Online Users:</h3>
+    <ul id="online-users"></ul>
+
+    <textarea id="content" oninput="sendUpdate()">{{note.content}}</textarea>
+</body>
+</html>
