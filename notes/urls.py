@@ -1,6 +1,10 @@
 from django.urls import path
-from .views import note_view
+from .views import (
+    note_view, NoteListCreateView, NoteDetailView,
+)
 
 urlpatterns = [
-    path("<int:note_id>/", note_view, name="note"),
+    path('notes/', NoteListCreateView.as_view(), name='note-list-create'),
+    path('notes/<int:pk>/', NoteDetailView.as_view(), name='note-detail'),
+    path("ui/<int:note_id>/", note_view, name="note-ui"),
 ]

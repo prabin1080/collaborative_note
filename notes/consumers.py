@@ -11,16 +11,18 @@ class NoteConsumer(AsyncWebsocketConsumer):
         self.room_group_name = f"note_{self.note_id}"
         self.user = self.scope["user"]
 
-        if self.user.is_authenticated:
-            await sync_to_async(redis_client.sadd)(f"online_users:{self.note_id}", self.user.username)
+        if not self.user.is_authenticated:
+            users = await sync_to_async(redis_client.smembers)(f"online_users:{self.note_id}")
+            self.user.username = f'Guest_{len(users)}'
+        await sync_to_async(redis_client.sadd)(f"online_users:{self.note_id}", self.user.username)
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
         await self.broadcast_online_users()
 
     async def disconnect(self, close_code):
-        if self.user.is_authenticated:
-            await sync_to_async(redis_client.srem)(f"online_users:{self.note_id}", self.user.username)
+        # if self.user.is_authenticated:
+        await sync_to_async(redis_client.srem)(f"online_users:{self.note_id}", self.user.username)
 
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         await self.broadcast_online_users()
