@@ -13,7 +13,8 @@ class NoteConsumer(AsyncWebsocketConsumer):
 
         if not self.user.is_authenticated:
             users = await sync_to_async(redis_client.smembers)(f"online_users:{self.note_id}")
-            self.user.username = f'Guest_{len(users)}'
+            if not self.user.username:
+                self.user.username = f'Guest_{len(users)}'
         await sync_to_async(redis_client.sadd)(f"online_users:{self.note_id}", self.user.username)
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)

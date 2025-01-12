@@ -99,7 +99,7 @@ if 'POSTGRES_PASSWORD_FILE' in os.environ:
     with open(os.environ['POSTGRES_PASSWORD_FILE'], 'r') as f:
         POSTGRES_PASSWORD = f.read().strip()
         DATABASE_HOST = 'db'
-        REDIS_HOST = 'redis://redis:6379'
+        REDIS_HOST = 'redis'
         REDIS_PORT = 6379
         REDIS_DB = 0
 else:
@@ -127,7 +127,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", REDIS_PORT)],
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }
