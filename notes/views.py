@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Note
 from rest_framework import generics, permissions
+from .permissions import IsOwnerOrSafe
 from .serializers import NoteSerializer
 
 
@@ -23,7 +24,7 @@ class NoteListCreateView(generics.ListCreateAPIView):
 
 class NoteDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = NoteSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsOwnerOrSafe]
 
     def get_queryset(self):
-        return Note.objects.filter(owner=self.request.user)
+        return Note.objects.all()

@@ -20,7 +20,7 @@ class SignUpView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         token, created = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key}, status=status.HTTP_201_CREATED)
+        return Response({'username':user.username, 'token': token.key}, status=status.HTTP_201_CREATED)
 
 
 class LoginView(CreateAPIView):
@@ -32,7 +32,7 @@ class LoginView(CreateAPIView):
         user = authenticate(**serializer.validated_data)
         if user is not None:
             token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key}, status=status.HTTP_200_OK)
+            return Response({'username':user.username, 'token': token.key}, status=status.HTTP_200_OK)
         return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class LogoutView(APIView):
